@@ -14,7 +14,8 @@ io.on('connection', function(socket) {
 	socket.on('message', function(message) {
 		console.log('Message received: ' + message.text);
 		// Sends to everyont BUT the sender
-		socket.broadcast.emit('message', message);
+		//socket.broadcast.emit('message', message); // broadcasts to everyone BUT this socket
+		io.emit('message', message);
 	});
 
 	socket.emit('message', {
