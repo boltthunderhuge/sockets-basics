@@ -5,11 +5,13 @@ socket.on('connect', function() {
 });
 
 socket.on('message', function(message){
-	console.log('new message!');
-	console.log(message.text);
 
 	var $messageDiv = jQuery('.messages');
-	$messageDiv.append('<p>' + message.text + "</p>");
+	console.log(message.text);
+
+	var formattedLocalTime = moment.utc(message.timeStamp).local().format('h:mma');
+	var messageWithTime = formattedLocalTime;// + ' : ' + message.text;
+	$messageDiv.append('<p><strong>' + formattedLocalTime + '</strong>' + ' : ' + message.text + "</p>");
 });
 
 // handles submitting of new message

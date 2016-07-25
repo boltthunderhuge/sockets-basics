@@ -14,6 +14,8 @@ console.log(now.valueOf());
 var timestamp = 1469461567012;
 var timestampMoment = moment.utc(timestamp);
 
+console.log(timestampMoment);
+
 console.log(timestampMoment.format());
 
 function timeStamp2Time(timestamp) {

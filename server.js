@@ -1,5 +1,6 @@
 var PORT = process.env.PORT || 3000;
 var express = require('express');
+var moment = require('moment');
 
 var app = express();
 
@@ -12,17 +13,28 @@ io.on('connection', function(socket) {
 	console.log('user connected via socket.io!');
 
 	socket.on('message', function(message) {
-		console.log('Message received: ' + message.text);
+		sendMessageWithTimeStamp(io, message.text);
+
+		/*console.log('Message received: ' + message.text);
 		// Sends to everyont BUT the sender
 		//socket.broadcast.emit('message', message); // broadcasts to everyone BUT this socket
-		io.emit('message', message);
+		io.emit('message', message);*/
 	});
 
-	socket.emit('message', {
+	sendMessageWithTimeStamp(socket, 'Welcome to the chat app');
+	/*socket.emit('message', {
 		text: 'Welcome to the chat app'
-	});
+	});*/
 });
 
 http.listen(PORT, function() {
 	console.log("Server started. Listening on port " + PORT);
 });
+
+function sendMessageWithTimeStamp(channel, message) {
+
+	channel.emit('message', {
+		text: message,
+		timeStamp: moment.valueOf()
+	});
+}
