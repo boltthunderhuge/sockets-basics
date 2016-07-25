@@ -13,7 +13,7 @@ io.on('connection', function(socket) {
 	console.log('user connected via socket.io!');
 
 	socket.on('message', function(message) {
-		sendMessageWithTimeStamp(io, message.text);
+		sendMessageWithTimeStamp(io, message.name, message.text);
 
 		/*console.log('Message received: ' + message.text);
 		// Sends to everyont BUT the sender
@@ -21,7 +21,7 @@ io.on('connection', function(socket) {
 		io.emit('message', message);*/
 	});
 
-	sendMessageWithTimeStamp(socket, 'Welcome to the chat app');
+	sendMessageWithTimeStamp(socket, 'System', 'Welcome to the chat app');
 	/*socket.emit('message', {
 		text: 'Welcome to the chat app'
 	});*/
@@ -31,9 +31,10 @@ http.listen(PORT, function() {
 	console.log("Server started. Listening on port " + PORT);
 });
 
-function sendMessageWithTimeStamp(channel, message) {
+function sendMessageWithTimeStamp(channel, name, message) {
 
 	channel.emit('message', {
+		name: name,
 		text: message,
 		timeStamp: moment.valueOf()
 	});

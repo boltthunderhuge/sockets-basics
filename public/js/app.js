@@ -1,7 +1,14 @@
+var name = getQueryVariable('name') || 'Mystery Dude';
+var room = getQueryVariable('room');
+
 var socket = io();
 
 socket.on('connect', function() {
 	console.log('connected to socket.io server');
+
+	socket.emit('message', {
+		text: name + ' joined ' + room
+	});
 });
 
 socket.on('message', function(message){
@@ -11,7 +18,8 @@ socket.on('message', function(message){
 
 	var formattedLocalTime = moment.utc(message.timeStamp).local().format('h:mma');
 	var messageWithTime = formattedLocalTime;// + ' : ' + message.text;
-	$messageDiv.append('<p><strong>' + formattedLocalTime + '</strong>' + ' : ' + message.text + "</p>");
+	$messageDiv.append('<p><strong>' + message.name + ' ' + formattedLocalTime + '</strong>');
+	$messageDiv.append('<p>' + message.text + "</p>");
 });
 
 // handles submitting of new message
@@ -22,6 +30,7 @@ $form.on('submit', function(event) {
 
 	var $messageField = $form.find('input[name=message]');
 	socket.emit('message', {
+		name: name,
 		text: $messageField.val() // selector locates any input tag within $form with a name attribute that equals 'message'
 	});
 
