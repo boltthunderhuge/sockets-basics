@@ -3,6 +3,8 @@ var room = getQueryVariable('room');
 
 var socket = io();
 
+var $room = jQuery(".room-title").text(room);
+
 socket.on('connect', function() {
 	console.log('connected to socket.io server');
 
