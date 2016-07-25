@@ -7,7 +7,8 @@ socket.on('connect', function() {
 	console.log('connected to socket.io server');
 
 	socket.emit('message', {
-		text: name + ' joined ' + room
+		name: name,
+		text: 'joined ' + room
 	});
 });
 

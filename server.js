@@ -13,6 +13,7 @@ io.on('connection', function(socket) {
 	console.log('user connected via socket.io!');
 
 	socket.on('message', function(message) {
+		console.log("message.name " + message.name);
 		sendMessageWithTimeStamp(io, message.name, message.text);
 
 		/*console.log('Message received: ' + message.text);
@@ -33,6 +34,7 @@ http.listen(PORT, function() {
 
 function sendMessageWithTimeStamp(channel, name, message) {
 
+	console.log(channel + ' ' + name + ' ' + message);
 	channel.emit('message', {
 		name: name,
 		text: message,
