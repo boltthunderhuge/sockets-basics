@@ -11,6 +11,31 @@ app.use(express.static(__dirname + '/public'));
 
 var clientInfo = {};
 
+function sendUserList(socket) {
+	var info = clientInfo[socket.id];
+	var users = [];
+
+	// or if (typeof info === 'undefined') ??
+	if (!info) {
+		return;
+	}
+
+	Object.keys(clientInfo).forEach(function(socketId) {
+		console.log('Checking ' + info.room + ' against ' + clientInfo[socketId].room);
+		if (info.room === clientInfo[socketId].room) {
+			//console.log('pushing user ' + clientInfo[socketId].user);
+			users.push(clientInfo[socketId].name);
+		}
+	});
+
+	io.to(clientInfo[socket.id].room).emit('message', {
+		name: 'System',
+		text: 'users : ' + users.join(' '),
+		timestamp: moment().valueOf()
+	});
+}
+
+
 io.on('connection', function(socket) {
 
 	//logRooms(socket);
@@ -38,8 +63,18 @@ io.on('connection', function(socket) {
 
 	socket.on('message', function(message) {
 		console.log("message.name " + message.name + ' in room ' + message.rooom);
+
+		// Intercept special messages
+		if (message.text === "@currentUsers") {
+			// do something special
+			sendUserList(socket);
+		} else if (message.text.startsWith('@private')) {
+			makePrivateMessage(socket, message);
+		}
+	
 		message.timeStamp = moment().valueOf();
 		io.to(clientInfo[socket.id].room).emit('message', message);
+		
 	});
 
 	socket.on('joinroom', function(req) {
@@ -60,6 +95,15 @@ io.on('connection', function(socket) {
 http.listen(PORT, function() {
 	console.log("Server started. Listening on port " + PORT);
 });
+
+function makePrivateMessage(socket, message) {
+	// split the incoming message into component parts
+	// First, the @private
+	var nameAndMessage = message.text.slice('@private '.length);
+	var firstSpace = nameAndMessage.indexOf(' ');
+	message.recipientName = nameAndMessage.slice(0, firstSpace);
+	message.text = nameAndMessage.slice(firstSpace+1);
+}
 
 function logRooms(socket) {
 	console.log('Logging rooms...');

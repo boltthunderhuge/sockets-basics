@@ -17,6 +17,13 @@ socket.on('connect', function() {
 
 socket.on('message', function(message){
 
+	if (typeof message.recipientName !== 'undefined') {
+		if (message.recipientName !== name) {
+			// it's not for us
+			return;
+		}
+	}
+
 	var $messageDiv = jQuery('.messages');
 
 	var formattedLocalTime = moment.utc(message.timeStamp).local().format('h:mma');
