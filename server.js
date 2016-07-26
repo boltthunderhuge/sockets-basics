@@ -9,35 +9,32 @@ var io = require('socket.io')(http);
 
 app.use(express.static(__dirname + '/public'));
 
+var clientInfo = {};
+
 io.on('connection', function(socket) {
 	console.log('user connected via socket.io!');
 
 	socket.on('message', function(message) {
-		console.log("message.name " + message.name);
-		sendMessageWithTimeStamp(io, message.name, message.text);
-
-		/*console.log('Message received: ' + message.text);
-		// Sends to everyont BUT the sender
-		//socket.broadcast.emit('message', message); // broadcasts to everyone BUT this socket
-		io.emit('message', message);*/
+		console.log("message.name " + message.name + ' in room ' + message.rooom);
+		message.timeStamp = moment().valueOf();
+		io.to(clientInfo[socket.id].room).emit('message', message);
 	});
 
-	sendMessageWithTimeStamp(socket, 'System', 'Welcome to the chat app');
-	/*socket.emit('message', {
-		text: 'Welcome to the chat app'
-	});*/
+	socket.on('joinroom', function(req) {
+		clientInfo[socket.id] = req;
+		socket.join(req.room);
+
+		socket.broadcast.to(req.room).emit('message', {
+			name: 'System',
+			text: req.name + ' has joined ' + req.room,
+			timeStamp: moment().valueOf
+		});
+	});
+
+	socket.emit('message', {name: 'System', text: 'Welcome to the chat app', timeStamp: moment().valueOf()});
+
 });
 
 http.listen(PORT, function() {
 	console.log("Server started. Listening on port " + PORT);
 });
-
-function sendMessageWithTimeStamp(channel, name, message) {
-
-	console.log(channel + ' ' + name + ' ' + message);
-	channel.emit('message', {
-		name: name,
-		text: message,
-		timeStamp: moment.valueOf()
-	});
-}

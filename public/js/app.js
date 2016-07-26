@@ -5,22 +5,21 @@ var socket = io();
 
 var $room = jQuery(".room-title").text(room);
 
+
 socket.on('connect', function() {
 	console.log('connected to socket.io server');
 
-	socket.emit('message', {
+	socket.emit('joinroom', {
 		name: name,
-		text: 'joined ' + room
+		room: room
 	});
 });
 
 socket.on('message', function(message){
 
 	var $messageDiv = jQuery('.messages');
-	console.log(message.text);
 
 	var formattedLocalTime = moment.utc(message.timeStamp).local().format('h:mma');
-	var messageWithTime = formattedLocalTime;// + ' : ' + message.text;
 	$messageDiv.append('<p><strong>' + message.name + ' ' + formattedLocalTime + '</strong>');
 	$messageDiv.append('<p>' + message.text + "</p>");
 });
