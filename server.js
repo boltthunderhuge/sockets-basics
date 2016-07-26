@@ -12,7 +12,29 @@ app.use(express.static(__dirname + '/public'));
 var clientInfo = {};
 
 io.on('connection', function(socket) {
+
+	//logRooms(socket);
+
 	console.log('user connected via socket.io!');
+
+	socket.on('disconnect', function() {
+		console.log('received disconnect');
+	
+		var userData = clientInfo[socket.id];
+
+		// if we're 'connected' to this room
+		if (typeof userData !== 'undefined') {
+			console.log(userData);
+			socket.leave(userData.room);
+			io.to(userData.room).emit('message', {
+				name: 'System',
+				text: userData.name + ' has left!',
+				timestamp: moment().valueOf()
+			});
+
+			delete clientInfo[socket.id];
+		}
+	});
 
 	socket.on('message', function(message) {
 		console.log("message.name " + message.name + ' in room ' + message.rooom);
@@ -38,3 +60,17 @@ io.on('connection', function(socket) {
 http.listen(PORT, function() {
 	console.log("Server started. Listening on port " + PORT);
 });
+
+function logRooms(socket) {
+	console.log('Logging rooms...');
+	console.log(socket);
+
+	for (var p in socket) {
+		if (socket.hasOwnProperty(p)) {
+			console.log(p + ' ' + socket[p]);
+		}
+	}
+	socket.rooms.forEach(function(room) {
+		console.log(room);
+	});
+}
