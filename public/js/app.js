@@ -24,11 +24,13 @@ socket.on('message', function(message){
 		}
 	}
 
-	var $messageDiv = jQuery('.messages');
+	var $messages = jQuery('.messages');
+	var $message = jQuery('<li class="list-group-item"></li>');
 
 	var formattedLocalTime = moment.utc(message.timeStamp).local().format('h:mma');
-	$messageDiv.append('<p><strong>' + message.name + ' ' + formattedLocalTime + '</strong>');
-	$messageDiv.append('<p>' + message.text + "</p>");
+	$message.append('<p><strong>' + message.name + ' ' + formattedLocalTime + '</strong>');
+	$message.append('<p>' + message.text + "</p>");
+	$messages.append($message);
 });
 
 // handles submitting of new message
